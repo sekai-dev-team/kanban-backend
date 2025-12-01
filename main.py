@@ -10,12 +10,20 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
+# app.add_middleware(
+#     CORSMiddleware,
+#     allow_origins=origins,  # 允许这些来源
+#     allow_credentials=True,
+#     allow_methods=["*"],  # 允许所有方法 (GET, POST, OPTIONS 等)
+#     allow_headers=["*"],  # 允许所有 Header
+# )
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # 允许这些来源
+    allow_origins=["*"],  # [关键修改] 允许任何 IP 访问，彻底消除 CORS 问题
     allow_credentials=True,
-    allow_methods=["*"],  # 允许所有方法 (GET, POST, OPTIONS 等)
-    allow_headers=["*"],  # 允许所有 Header
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 DATA_DIR = "data"
 file_lock = threading.Lock()
