@@ -130,9 +130,11 @@ def create_app(data_dir: str = "data") -> FastAPI:
     return app
 
 
+# 创建一个顶层的 app 实例，供 uvicorn 启动时查找
+app = create_app()
+
 # 应用启动入口
 if __name__ == "__main__":
     import uvicorn
-
-    app = create_app()
+    # 当直接运行此脚本时，使用这个 app 实例
     uvicorn.run(app, host="0.0.0.0", port=8000)
