@@ -1,0 +1,25 @@
+services:
+  kanban-backend:
+    image: kanban-backend-image-v1:latest
+    container_name: kanban-backend-app
+    restart: always
+    ports:
+      - "8000:8000"
+    volumes:
+      # 将容器内的数据和日志目录持久化到服务器上
+      - ./data:/home/app/data
+      - ./log:/home/app/log
+    # (可选) 如果你的应用需要环境变量，可以在这里配置
+    # environment:
+    #   - DATABASE_URL=your_database_url
+
+  # Watchtower 服务，用于自动更新
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    volumes:
+      # 需要挂载 docker.sock 才能监控和操作其他容器
+      - /var/run/docker.sock:/var/run/docker.sock
+    # Watchtower 会每隔 3600 秒检查一次是否有新镜像
+    command: --interval 3600

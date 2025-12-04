@@ -1,20 +1,35 @@
-# 使用官方的 Python 基础镜像
-FROM python:3.9-slim
+# --------------------------------- Build ---------------------------------
+FROM python:3.10-slim AS builder
+WORKDIR /opt/app
 
-# 设置工作目录
-WORKDIR /app
+# 设置 PYTHONDONTWRITEBYTECODE 来阻止 Python 写入 .pyc 文件
+# 设置 PYTHONUNBUFFERED 来确保日志直接输出，方便 Docker 收集
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+RUN addgroup --system app && adduser --system --group app
 
-# 复制依赖文件并安装依赖
-# 这样做可以利用 Docker 的层缓存机制，只有当 requirements.txt 变化时才会重新安装
-COPY requirements.txt requirements.txt
-RUN pip install --no-cache-dir --upgrade -r requirements.txt
+COPY requirements.txt ./
 
-# 复制项目代码到工作目录
-COPY . .
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 暴露端口，FastAPI 默认运行在 8000 端口
+# --------------------------------- Run ---------------------------------
+FROM python:3.10-slim
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PATH="/opt/venv/bin:$PATH"
+WORKDIR /home/app
+COPY --from=builder /etc/passwd /etc/passwd
+COPY --from=builder /etc/group /etc/group
+
+# 从构建阶段复制安装好依赖的虚拟环境
+COPY --from=builder /opt/venv /opt/venv
+
+COPY ./src ./src
+RUN mkdir -p /home/app/log /home/app/data && \
+    chown -R app:app /home/app
+USER app
 EXPOSE 8000
 
-# 启动应用的命令
-# 使用 --host 0.0.0.0 使其可以从容器外部访问
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
