@@ -1,5 +1,27 @@
-
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Project specific
 /data
-log/
+/log
 .pytest_cache/
+coverage.xml
+.coverage
+htmlcov/

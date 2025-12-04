@@ -1,6 +1,6 @@
 services:
   kanban-backend:
-    image: 007hikari/kanban-backend-image-v1:latest
+    image: 007hikari/kanban-backend:latest #! 要与main.yml一致
     container_name: kanban-backend-app
     restart: always
     ports:
